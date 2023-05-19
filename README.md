@@ -1,4 +1,4 @@
-# Chess-with-UI-Qt-
+# Chess with UI (Qt)
 Chess application using Qt framework
 
 <img src="https://github.com/JPcooldev/Chess-with-UI-Qt-/blob/main/READMEimages/ChessGame.png" width="300">
