@@ -261,54 +261,87 @@ std::string Game::whoTurnDisplay(Color color)
 
 void Game::getInput(QString input)
 {
-    qDebug() << "Game saw that " << input << "was clicked, and will now respond.";
+    //qDebug() << "Game saw that " << input << "was clicked, and will now respond.";
 
     if (m_move1 == "")
     {
         m_move1 = input.toStdString();
-        emit sendResponse("");
-        //emit sendLocationToGetHelp(input);
-        qDebug() << "first click";
+        emit sendResponseToDisplay("Choosing piece");
+
+        std::pair<int, int> squareFrom {textToCoordinates(m_move1)};
+
+        if (m_chessboard.getPiece(squareFrom) == nullptr)
+        {
+            qDebug() << "first click: empty square selected";
+
+            emit sendResponseToDisplay("Empty square selected");
+            emit sendLocationOfSquareToClearColor(QString::fromStdString(m_move1));
+            resetMoves();
+        }
+        else
+        {
+            if (isRightTurn(squareFrom, m_turn))
+            {
+                qDebug() << "first click: " << input << " (valid)";
+
+                helpActivated = true;
+                emit sendLocationToGetHelp(input);
+            }
+            else
+            {
+                qDebug() << "first click: not right turn";
+
+                emit sendResponseToDisplay("Not right turn");
+                emit sendLocationOfSquareToClearColor(QString::fromStdString(m_move1));
+                resetMoves();
+            }
+        }
     }
     else
     {
-        m_move2 = input.toStdString();
-        //emit signalClearPossibleMovesColor(QString::fromStdString(m_move1), QString::fromStdString(m_move2));
+        qDebug() << "second click: " << input;
 
-        qDebug() << "send clear color: first click";
+        m_move2 = input.toStdString();
+
         emit sendLocationOfSquareToClearColor(QString::fromStdString(m_move1));
-        qDebug() << "send clear color: second click";
         emit sendLocationOfSquareToClearColor(QString::fromStdString(m_move2));
 
-
-
+        if (helpActivated)
+        {
+            helpActivated = false;
+            emit signalClearPossibleMovesColor(QString::fromStdString(m_move1), QString::fromStdString(m_move2));
+        }
 
         std::pair<int, int> squareFrom {textToCoordinates(m_move1)};
         std::pair<int, int> squareTo {textToCoordinates(m_move2)};
 
-        if ( ! m_chessboard.isOccupied(squareFrom) )
-        {
-            qDebug() << "Empty square selected";
-            emit sendResponse("Invalid move");
-            resetMoves();
-            return;
-        }
+        QString move1_QString {QString::fromStdString(m_move1)};
+        QString move2_QString {QString::fromStdString(m_move2)};
 
-        if ( ! isRightTurn(squareFrom, m_turn) )
-        {
-            qDebug() << "Not right turn";
-            emit sendResponse("Invalid move");
-            resetMoves();
-            return;
-        }
+        /*
+        bool eligibleMove = false;
 
-        if ( m_chessboard.movePiece(squareFrom, squareTo) )
+        // check if second click is eligible
+        for (const auto &location : searchPossibleMoves(move1_QString))
         {
+            if (location == move2_QString)
+            {
+                eligibleMove = true;
+                qDebug() << "Move is marked as eligible";
+            }
+        }
+        */
+
+        if (m_chessboard.movePiece(squareFrom, squareTo))
+        {
+
+            qDebug() << "Move is eligible";
+
             if ( isInCheck(m_turn))
             {
                 qDebug() << "Invalid move: This leaves " << whoTurnDisplayQString(m_turn) << " in check";
                 m_chessboard.revertLastMove();
-                emit sendResponse("Invalid move");
+                emit sendResponseToDisplay("Invalid move");
                 resetMoves();
                 return;
             }
@@ -321,30 +354,56 @@ void Game::getInput(QString input)
                 else
                     setTurn(WHITE);
 
-                QString response {QString::fromStdString(m_move1) +
-                                  QString::fromStdString(m_move2)};
-                emit sendResponse(response);
+                QString response {move1_QString + move2_QString};
+                emit sendResponseToDisplay(response);
 
-                //emit sendLocationToLogMoves(response);
+                resetMoves();
             }
+
+            if ( isInCheckMate(m_turn))
+                emit sendResponseToDisplay("Checkmate");
+            else if ( isInStalemate(m_turn))
+                emit sendResponseToDisplay("Stalemate");
+            else if ( isInCheck(m_turn))
+                emit sendResponseToDisplay("Check");
         }
         else
         {
-            qDebug() << "Invalid move";
-            m_chessboard.revertLastMove();
-            emit sendResponse("Invalid move");
-            resetMoves();
-            return;
+            qDebug() << "Move is not eligible";
+
+            /* move is not valid, but user might click on his other piece
+             * meaning, he wants to activate help for this piece
+             */
+            if (m_chessboard.getPiece(squareTo) == nullptr)
+            {
+                qDebug() << "second click: empty square selected";
+
+                emit sendResponseToDisplay("Empty square selected");
+                resetMoves();
+                return;
+            }
+            else
+            {
+                if (m_chessboard.getPiece(squareTo)->getColor() == m_turn)
+                {
+                    qDebug() << "second click on same color -> get help";
+
+                    resetMoves();
+                    emit signalChangeColorOfSquare(input);
+                    getInput(input);
+                    //emit sendResponseToGame(move2_QString);
+                    return;
+                }
+                else
+                {
+                    qDebug() << "second click: not right turn";
+
+                    emit sendResponseToDisplay("Invalid move");
+                    resetMoves();
+                    return;
+                }
+            }
         }
-
-        if ( isInCheckMate(m_turn))
-            emit sendResponse("Checkmate");
-        else if ( isInStalemate(m_turn))
-            emit sendResponse("Stalemate");
-        else if ( isInCheck(m_turn))
-            emit sendResponse("Check");
-
-        resetMoves();
     }
 }
 
@@ -388,11 +447,6 @@ QVector<QString> Game::searchPossibleMoves(QString square)
     return possibleMoves;
 }
 
-void Game::setPossibleMoves(QVector<QString> moves)
-{
-    m_possibleMoves = moves;
-}
-
 const QVector<QString>& Game::getPossibleMoves() const
 {
     return m_possibleMoves;
@@ -402,4 +456,3 @@ void Game::clearPossibleMoves()
 {
     m_possibleMoves.clear();
 }
-

@@ -5,15 +5,16 @@
 #include <QObject>
 #include <QPair>
 
-
-
 Display::Display(QWidget *parent)
     : QMainWindow(parent)
     //, ui(new Ui::Display)
 {
-    QObject::connect(&game, &Game::sendResponse, this, &Display::getResponse);
-    //QObject::connect(&game, &Game::signalClearPossibleMovesColor, this, &Display::clearPossibleMovesColor);
-    //QObject::connect(&game, &Game::sendLocationToGetHelp, this, &Display::colorHelp);
+    QObject::connect(&game, &Game::sendResponseToDisplay, this, &Display::getResponseFromGame);
+
+    QObject::connect(&game, &Game::sendLocationToGetHelp, this, &Display::colorHelp);
+    QObject::connect(&game, &Game::signalClearPossibleMovesColor, this, &Display::clearPossibleMovesColor);
+
+    //QObject::connect(&game, &Game::sendResponseToGame, &game, &game)
 
     scene = new QGraphicsScene();
     setupBoard(squareSize);
@@ -25,7 +26,7 @@ Display::Display(QWidget *parent)
 
     statusRect = new QGraphicsRectItem();
     statusRect->setRect(squaresBoard[7]->rect().right() + sideBoardSize + 5, squaresBoard[7]->rect().top(),
-                        150, squareSize);
+                        250, squareSize);
     statusRect->setBrush(Qt::white);
 
     statusText = new QGraphicsTextItem("Let's start");
@@ -38,7 +39,7 @@ Display::Display(QWidget *parent)
 
     turnRect = new QGraphicsRectItem();
     turnRect->setRect(squaresBoard[15]->rect().right() + sideBoardSize + 5, squaresBoard[15]->rect().top() + 5,
-                      150, squareSize - 5);
+                      250, squareSize - 5);
     turnRect->setBrush(Qt::white);
 
     turnText = new QGraphicsTextItem("White's Turn");
@@ -50,8 +51,8 @@ Display::Display(QWidget *parent)
     turnText->setScale(1.3);
 
     statusTextLabel = new QGraphicsTextItem("Status:");
-    statusTextLabel->setPos(squaresBoard[7]->boundingRect().right() + sideBoardSize +
-                            statusRect->boundingRect().width()/2 - statusTextLabel->boundingRect().width()/2,
+    statusTextLabel->setPos(squaresBoard[7]->boundingRect().right() + sideBoardSize + 10,
+                            //statusRect->boundingRect().width()/2 - statusTextLabel->boundingRect().width()/2,
                             squaresBoard[7]->boundingRect().top() - statusTextLabel->boundingRect().height() - 10);
     statusTextLabel->setScale(1.3);
 
@@ -99,6 +100,8 @@ void Display::setupBoard(int size)
                              &game, &Game::getInput);
             QObject::connect(&game, &Game::sendLocationOfSquareToClearColor,
                              square, &Square::clearColor);
+            QObject::connect(&game, &Game::signalChangeColorOfSquare,
+                             square, &Square::changeColorOfSquare);
 
             x += size;
             if (x == 8 * size)
@@ -276,14 +279,26 @@ void Display::setTurnText(const QString& str)
     turnText->setPlainText(str);
 }
 
-void Display::getResponse(QString response)
+void Display::getResponseFromGame(QString response)
 {
     std::string responseString = response.toStdString();
 
     // first click (choosing squareFrom)
-    if (responseString == "")
+    if (responseString == "Choosing piece")
     {
         statusText->setPlainText("");
+        return;
+    }
+
+    if (responseString == "Not right turn")
+    {
+        statusText->setPlainText("Not right turn");
+        return;
+    }
+
+    if (responseString == "Empty square selected")
+    {
+        statusText->setPlainText("Empty square selected");
         return;
     }
 
@@ -291,9 +306,9 @@ void Display::getResponse(QString response)
     {
         qDebug() << "Check";
         statusText->setPlainText("Check");
+        return;
     }
-
-    if (responseString == "Invalid move")
+    else if (responseString == "Invalid move")
     {
         qDebug() << "Invalid move";
         statusText->setPlainText("Invalid move");
@@ -360,34 +375,34 @@ void Display::getResponse(QString response)
         }
         */
 
-            QString squareFrom {""};
-            QString squareTo {""};
-            squareFrom += response[0];
-            squareFrom += response[1];
-            squareTo += response[2];
-            squareTo += response[3];
+        QString squareFrom {""};
+        QString squareTo {""};
+        squareFrom += response[0];
+        squareFrom += response[1];
+        squareTo += response[2];
+        squareTo += response[3];
 
-            movesStrings.push_back(qMakePair(squareFrom, squareTo));
+        movesStrings.push_back(qMakePair(squareFrom, squareTo));
 
-            QString tempImage;
+        QString tempImage;
 
-            for (int i = 0; i < squaresBoard.size(); i++ )
+        for (int i = 0; i < squaresBoard.size(); i++ )
+        {
+            if (squaresBoard[i]->getName() == squareFrom)
             {
-                if (squaresBoard[i]->getName() == squareFrom)
-                {
-                    tempImage = squaresBoard[i]->getPath();
-                    squaresBoard[i]->clearImage();
-                    break;
-                }
+                tempImage = squaresBoard[i]->getPath();
+                squaresBoard[i]->clearImage();
+                break;
             }
-            for (int i = 0; i < squaresBoard.size(); i++ )
+        }
+        for (int i = 0; i < squaresBoard.size(); i++ )
+        {
+            if (squaresBoard[i]->getName() == squareTo)
             {
-                if (squaresBoard[i]->getName() == squareTo)
-                {
-                    squaresBoard[i]->setImage(tempImage);
-                    break;
-                }
+                squaresBoard[i]->setImage(tempImage);
+                break;
             }
+        }
 
         if (turnColor == WHITE)
         {
@@ -410,8 +425,6 @@ void Display::logMoves(QString move)
 
 void Display::colorHelp(QString location)
 {
-    //game.setPossibleMoves(game.searchPossibleMoves(location));
-
     for (const auto &possibleLoc : game.searchPossibleMoves(location))
     {
         for (auto &square : squaresBoard)
@@ -419,7 +432,7 @@ void Display::colorHelp(QString location)
             if (possibleLoc == square->getName())
             {
                 square->setColor(square->brush());
-                QBrush brush(Qt::green);
+                QBrush brush(Qt::lightGray);
                 square->setBrush(brush);
             }
         }

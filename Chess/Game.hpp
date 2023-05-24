@@ -55,6 +55,7 @@ private:
     Color m_turn {WHITE};
     int m_moveCounter {0};
     QVector<QString> m_possibleMoves {};
+    bool helpActivated {false};
 
     void resetMoves();
     void setTurn(Color turn);
@@ -75,11 +76,13 @@ private:
 public slots:
     void getInput(QString input);
 signals:
-    void sendResponse(QString response);
+    void sendResponseToDisplay(QString response);
+    void sendResponseToGame(QString response);
     void sendLocationOfSquareToClearColor(QString location);
     void sendLocationToGetHelp(QString location);
     void sendLocationToLogMoves(QString location);
     void signalClearPossibleMovesColor(QString locFrom, QString locTo);
+    void signalChangeColorOfSquare(QString squarename);
 };
 
 #endif /* Game_hpp */

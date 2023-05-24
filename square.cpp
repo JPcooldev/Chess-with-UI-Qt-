@@ -17,10 +17,21 @@ void Square::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
     {
+        /* if the second click is on the same square as the first click, square would set its
+         * previous color as a red, so after finding it's invalid move, square would color to
+         * its previous color, here to the red
+         */
+        if (this->brush() == Qt::red || this->brush() == Qt::lightGray)
+        {
+            setBrush(color);
+            emit clicked(this->name);
+            return;
+        }
+
         color = this->brush();
         QBrush brush(Qt::red);
         setBrush(brush);
-        qDebug() << "You clicked " << this->name;
+        //qDebug() << "You clicked " << this->name;
     }
     emit clicked(this->name);
 }
@@ -58,7 +69,6 @@ void Square::clearColor(QString location)
 {
     if (location == name)
     {
-        qDebug() << "clearColor " << name;
         setBrush(color);
     }
 }
@@ -68,6 +78,14 @@ void Square::setColor(QBrush color)
     this->color = color;
 }
 
-
+void Square::changeColorOfSquare(QString squarename)
+{
+    if (squarename == this->name)
+    {
+        color = this->brush();
+        QBrush brush(Qt::red);
+        setBrush(brush);
+    }
+}
 
 
