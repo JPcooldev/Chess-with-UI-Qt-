@@ -404,65 +404,6 @@ void Game::getInput(QString input)
                 }
             }
         }
-
-        /*
-        if ( ! m_chessboard.isOccupied(squareFrom) )
-        {
-            qDebug() << "Empty square selected: " << input;
-            emit sendResponseToDisplay("Invalid move");
-            resetMoves();
-            return;
-        }
-
-        if ( ! isRightTurn(squareFrom, m_turn) )
-        {
-            qDebug() << "Not right turn";
-            emit sendResponseToDisplay("Invalid move");
-            resetMoves();
-            return;
-        }
-
-        if ( m_chessboard.movePiece(squareFrom, squareTo) )
-        {
-            if ( isInCheck(m_turn))
-            {
-                qDebug() << "Invalid move: This leaves " << whoTurnDisplayQString(m_turn) << " in check";
-                m_chessboard.revertLastMove();
-                emit sendResponseToDisplay("Invalid move");
-                resetMoves();
-                return;
-            }
-            else
-            {
-                qDebug() << "Game allows this move and will let Display proceed";
-
-                if (m_turn == WHITE)
-                    setTurn(BLACK);
-                else
-                    setTurn(WHITE);
-
-                QString response {move1_QString + move2_QString};
-                emit sendResponseToDisplay(response);
-            }
-        }
-        else
-        {
-            qDebug() << "Invalid move";
-            m_chessboard.revertLastMove();
-            emit sendResponseToDisplay("Invalid move");
-            resetMoves();
-            return;
-        }
-
-        if ( isInCheckMate(m_turn))
-            emit sendResponseToDisplay("Checkmate");
-        else if ( isInStalemate(m_turn))
-            emit sendResponseToDisplay("Stalemate");
-        else if ( isInCheck(m_turn))
-            emit sendResponseToDisplay("Check");
-
-        resetMoves();
-        //*/
     }
 }
 
