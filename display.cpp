@@ -4,17 +4,21 @@
 
 #include <QObject>
 #include <QPair>
+#include <QMessageBox>
 
 Display::Display(QWidget *parent)
     : QMainWindow(parent)
     //, ui(new Ui::Display)
 {
+    setupWelcomePage();
+}
+
+void Display::setupGamePage()
+{
     QObject::connect(&game, &Game::sendResponseToDisplay, this, &Display::getResponseFromGame);
 
     QObject::connect(&game, &Game::sendLocationToGetHelp, this, &Display::colorHelp);
     QObject::connect(&game, &Game::signalClearPossibleMovesColor, this, &Display::clearPossibleMovesColor);
-
-    //QObject::connect(&game, &Game::sendResponseToGame, &game, &game)
 
     scene = new QGraphicsScene();
     setupBoard(squareSize);
@@ -67,7 +71,57 @@ Display::Display(QWidget *parent)
     scene->addItem(statusRect);
     scene->addItem(turnRect);
     //scene->addItem(movesRect);
-    //ui->setupUi(this);
+
+    graphicsView = new QGraphicsView(scene);
+    graphicsView->setFixedSize(1000, 800);
+    graphicsView->show();
+}
+
+void Display::setupWelcomePage()
+{
+    welcomePage = new QWidget();
+    welcomePage->setFixedSize(400, 300);
+    welcomePage->setStyleSheet("background-color: black;");
+
+    welcomeTitle = new QLabel("Welcome to game of chess");
+    welcomeTitle->setAlignment(Qt::AlignCenter);
+    welcomeTitle->setStyleSheet("font-size: 30px;");
+
+    welcomeSignature = new QLabel("Made by Jakub Prokop");
+    welcomeSignature->setAlignment(Qt::AlignCenter);
+
+    startButton = new QPushButton("Start", welcomePage);
+    startButton->setGeometry(200 - startButton->width()/2, 200, 80, 45);
+    QFont font = startButton->font();
+    font.setPointSize(font.pointSize() + 15);
+    startButton->setFont(font);
+    startButton->setStyleSheet("background-color: gray;");
+
+    welcomeImage = new QLabel();
+    QPixmap image("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/welcomePageImage.png");
+    welcomeImage->setPixmap(image);
+    welcomeImage->setScaledContents(true);
+
+    welcomePageLayout = new QVBoxLayout(welcomePage);
+    welcomePageLayout->addStretch();
+    welcomePageLayout->addWidget(welcomeTitle);
+    welcomePageLayout->addWidget(welcomeSignature);
+    welcomePageLayout->addWidget(welcomeImage);
+    welcomePageLayout->addWidget(startButton);
+    welcomePageLayout->addStretch();
+
+    welcomePage->setLayout(welcomePageLayout);
+
+    setCentralWidget(welcomePage);
+
+    QObject::connect(startButton, &QPushButton::clicked,
+                     this, &Display::runGame);
+}
+
+void Display::runGame()
+{
+    setupGamePage();
+    this->hide();
 }
 
 void Display::setupBoard(int size)
@@ -331,88 +385,76 @@ void Display::getResponseFromGame(QString response)
     {
         qDebug() << "Display got permission from Game to move icons.";
         qDebug() << "The response Game sent back was " << response;
-        /*
-        if (response == "Castle White Kingside")
-        {
-            qDebug() << "Display needs to castle white kingside.";
-            QString tempKing = spaceList[60]->getImage();
-            spaceList[60]->clearImage();
-            QString tempRook = spaceList[63]->getImage();
-            spaceList[63]->clearImage();
 
-            spaceList[62]->setImage(tempKing);
-            spaceList[61]->setImage(tempRook);
-        } else if (response == "Castle White Queenside")
+        if (response == "White queenside castle")
         {
-            qDebug() << "Display needs to castle white queenside.";
-            QString tempKing = spaceList[60]->getImage();
-            spaceList[60]->clearImage();
-            QString tempRook = spaceList[56]->getImage();
-            spaceList[56]->clearImage();
-
-            spaceList[58]->setImage(tempKing);
-            spaceList[59]->setImage(tempRook);
-        } else if (response == "Castle Black Kingside")
-        {
-            qDebug() << "Display needs to castle black kingside.";
-            QString tempKing = spaceList[4]->getImage();
-            spaceList[4]->clearImage();
-            QString tempRook = spaceList[7]->getImage();
-            spaceList[7]->clearImage();
-
-            spaceList[6]->setImage(tempKing);
-            spaceList[5]->setImage(tempRook);
-        } else if (response == "Castle Black Queenside")
-        {
-            qDebug() << "Display needs to castle black queenside.";
-            QString tempKing = spaceList[4]->getImage();
-            spaceList[4]->clearImage();
-            QString tempRook = spaceList[0]->getImage();
-            spaceList[0]->clearImage();
-
-            spaceList[2]->setImage(tempKing);
-            spaceList[3]->setImage(tempRook);
+            qDebug() << "Display White queenside castle";
+            QString tempRook = squaresBoard[56]->getPath();
+            squaresBoard[56]->clearImage();
+            squaresBoard[59]->setImage(tempRook);
         }
-        */
-
-        QString squareFrom {""};
-        QString squareTo {""};
-        squareFrom += response[0];
-        squareFrom += response[1];
-        squareTo += response[2];
-        squareTo += response[3];
-
-        movesStrings.push_back(qMakePair(squareFrom, squareTo));
-
-        QString tempImage;
-
-        for (int i = 0; i < squaresBoard.size(); i++ )
+        else if (response == "White kingside castle")
         {
-            if (squaresBoard[i]->getName() == squareFrom)
-            {
-                tempImage = squaresBoard[i]->getPath();
-                squaresBoard[i]->clearImage();
-                break;
-            }
+            qDebug() << "Display White kingside castle";
+            QString tempRook = squaresBoard[63]->getPath();
+            squaresBoard[63]->clearImage();
+            squaresBoard[61]->setImage(tempRook);
         }
-        for (int i = 0; i < squaresBoard.size(); i++ )
+        else if (response == "Black queenside castle")
         {
-            if (squaresBoard[i]->getName() == squareTo)
-            {
-                squaresBoard[i]->setImage(tempImage);
-                break;
-            }
+            qDebug() << "Black queenside castle";
+            QString tempRook = squaresBoard[0]->getPath();
+            squaresBoard[0]->clearImage();
+            squaresBoard[3]->setImage(tempRook);
         }
-
-        if (turnColor == WHITE)
+        else if (response == "Black kingside castle")
         {
-            turnColor = BLACK;
-            turnText->setPlainText("Black's Turn");
+            qDebug() << "Black kingside castle";
+            QString tempRook = squaresBoard[7]->getPath();
+            squaresBoard[7]->clearImage();
+            squaresBoard[5]->setImage(tempRook);
         }
         else
         {
-            turnColor = WHITE;
-            turnText->setPlainText("White's Turn");
+            QString squareFrom {""};
+            QString squareTo {""};
+            squareFrom += response[0];
+            squareFrom += response[1];
+            squareTo += response[2];
+            squareTo += response[3];
+
+            movesStrings.push_back(qMakePair(squareFrom, squareTo));
+
+            QString tempImage;
+
+            for (int i = 0; i < squaresBoard.size(); i++ )
+            {
+                if (squaresBoard[i]->getName() == squareFrom)
+                {
+                    tempImage = squaresBoard[i]->getPath();
+                    squaresBoard[i]->clearImage();
+                    break;
+                }
+            }
+            for (int i = 0; i < squaresBoard.size(); i++ )
+            {
+                if (squaresBoard[i]->getName() == squareTo)
+                {
+                    squaresBoard[i]->setImage(tempImage);
+                    break;
+                }
+            }
+
+            if (turnColor == WHITE)
+            {
+                turnColor = BLACK;
+                turnText->setPlainText("Black's Turn");
+            }
+            else
+            {
+                turnColor = WHITE;
+                turnText->setPlainText("White's Turn");
+            }
         }
     }
 
@@ -463,4 +505,12 @@ QGraphicsScene* Display::getScene()
     return scene;
 }
 
+void Display::closingEvent(QCloseEvent *event){
+    if(QMessageBox::question(this, "Quit?", "Do you really want to quit?",
+                              QMessageBox::Yes | QMessageBox::No,
+                              QMessageBox::No) == QMessageBox::Yes)
+        event->accept();
+    else
+        event->ignore();
+}
 
