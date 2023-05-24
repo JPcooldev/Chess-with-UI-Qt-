@@ -301,7 +301,39 @@ bool Chessboard::movePiece(const std::pair<int, int> &squareFrom, const std::pai
     // check if move is valid
     if ( ! isValidMove(squareFrom, squareTo))
         return false;
-        
+
+    // castle
+    if (getPiece(squareFrom)->getType() == KING && getMoveLength(squareFrom, squareTo) == 2)
+    {
+        // move king
+        std::unique_ptr<Piece> remainderFromMoveKing = setPieceOnSquare(squareFrom, squareTo);
+
+        std::pair<int, int> rookFrom;
+        std::pair<int, int> rookTo;
+
+        // castle to left
+        if (squareFrom.second > squareTo.second)
+        {
+            rookFrom = std::make_pair(squareFrom.first, 0);
+            rookTo = std::make_pair(squareFrom.first, squareFrom.second - 1);
+        }
+        else
+        {
+            rookFrom = std::make_pair(squareFrom.first, 7);
+            rookTo = std::make_pair(squareFrom.first, squareFrom.second + 1);
+        }
+
+        // move rook
+        std::unique_ptr<Piece> remainderFromMoveRook = setPieceOnSquare(rookFrom, rookTo);
+
+        m_board[squareTo.first][squareTo.second]->setMoves(+1);
+
+        m_moves.emplace_back(std::make_pair(rookFrom, rookTo));
+        m_moves.emplace_back(std::make_pair(squareFrom, squareTo));
+
+        return true;
+    }
+
     // makes move and possibly captured piece puts into captures
     std::unique_ptr<Piece> remainderFromMove = setPieceOnSquare(squareFrom, squareTo);
     
@@ -314,6 +346,24 @@ bool Chessboard::movePiece(const std::pair<int, int> &squareFrom, const std::pai
         m_captures.emplace_back(std::make_pair(std::move(remainderFromMove), squareTo));
     
     return true;
+}
+
+bool Chessboard::castle(const std::pair<int, int> &squareFrom, const std::pair<int, int> &squareTo) const
+{
+    std::pair<int, int> rookLeft {std::make_pair(squareFrom.first, 0)};
+    std::pair<int, int> rookRight {std::make_pair(squareFrom.first, 7)};
+
+    // castle left
+    if (squareFrom.second > squareTo.second)
+    {
+        return (getPiece(rookLeft)->getType() == ROOK && getPiece(rookLeft)->getMoves() == 0 && isPathFree(squareFrom, rookLeft));
+    }
+    else if (squareFrom.second < squareTo.second)
+    {
+        return (getPiece(rookRight)->getType() == ROOK && getPiece(rookRight)->getMoves() == 0 && isPathFree(squareFrom, rookRight));
+    }
+    else
+        return false;
 }
 
 std::unique_ptr<Piece> Chessboard::setPieceOnSquare(const std::pair<int, int> &squareFrom, const std::pair<int, int> &squareTo)
@@ -329,14 +379,6 @@ std::unique_ptr<Piece> Chessboard::setPieceOnSquare(const std::pair<int, int> &s
     
     return old;
 }
-
-/*
-//TEMPORARY
-std::vector<std::pair<int, int>> Chessboard::showPossibleMoves(const std::pair<int, int> &square)
-{
-    return std::vector<std::pair<int, int>> {0};
-}
- */
 
 //prints board
 void Chessboard::printBoard() const
@@ -450,18 +492,19 @@ bool Chessboard::isValidMove(const std::pair<int, int> &from, const std::pair<in
     if (from == to)
         return false;
 
+    // if piece is king which has not moved yet, check for castling
+    if (getPiece(from)->getType() == KING && getPiece(from)->getMoves() == 0 &&
+        getMoveLength(from, to) == 2 && isHorizontalMove(from, to))
+    {
+        if (castle(from, to))
+            return true;
+    }
+
     if (m_board[from.first][from.second]->isValidMove(*this, from, to))
         return true;
     else
         return false;
 }
-
-/*
-std::array<std::array<std::unique_ptr<Piece>, boardSize>, boardSize>& Chessboard::getBoard()
-{
-    return m_board;
-}
- */
 
 // reverts last move
 void Chessboard::revertLastMove()
@@ -471,6 +514,20 @@ void Chessboard::revertLastMove()
     std::pair<int, int> to {m_moves.back().first};
     m_moves.pop_back();
     
+    // reverting castling
+    if (getPiece(from)->getType() == KING && getMoveLength(from, to) == 2)
+    {
+        std::pair<int, int> fromRook {m_moves.back().second};
+        std::pair<int, int> toRook {m_moves.back().first};
+        m_moves.pop_back();
+
+        std::unique_ptr<Piece> remainderFromMoveKing = setPieceOnSquare(from, to);
+        std::unique_ptr<Piece> remainderFromMoveRook = setPieceOnSquare(fromRook, toRook);
+
+        m_board[to.first][to.second]->setMoves(-1);
+        return;
+    }
+
     // revert last move
     std::unique_ptr<Piece> remainderFromMove = setPieceOnSquare(from, to);
     

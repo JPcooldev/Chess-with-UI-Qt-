@@ -65,12 +65,10 @@ public:
     std::pair<int,int> getKingsLocation(Color color) const;
     const std::unique_ptr<Piece>& getPiece(const std::pair<int, int> &square) const;
     std::vector<std::pair<int, int>> getPossibleMoves(const std::pair<int, int> &square);
-    //std::array<std::array<std::unique_ptr<Piece>, boardSize>, boardSize>& getBoard();
     
     void revertLastMove();
     bool movePiece(const std::pair<int, int> &squareFrom, const std::pair<int, int> &squareTo);
-    
-    //std::vector<std::pair<int, int>> showPossibleMoves(const std::pair<int, int> &square);
+    bool castle(const std::pair<int, int> &squareFrom, const std::pair<int, int> &squareTo) const;
     
     void printBoard() const;
     void printCaptures() const;

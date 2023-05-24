@@ -9,6 +9,10 @@
 #include <QGraphicsTextItem>
 #include <QVector>
 #include <QGraphicsProxyWidget>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QGraphicsView>
+#include <QLabel>
 
 //QT_BEGIN_NAMESPACE
 //namespace Ui { class Display; }
@@ -21,7 +25,20 @@ class Display : public QMainWindow
 {
     Q_OBJECT
 
+    QMainWindow mainWindow;
+
+    // welcome page
+    QWidget *welcomePage;
+    QPushButton *startButton;
+    QVBoxLayout *welcomePageLayout;
+    QLabel *welcomeImage;
+    QLabel *welcomeTitle;
+    QLabel *welcomeSignature;
+
+
+    // game page
     QGraphicsScene *scene;
+    QGraphicsView *graphicsView;
     QVector<Square*> squaresBoard {};
     QGraphicsTextItem *titleText;
     QGraphicsTextItem *statusTextLabel;
@@ -67,6 +84,9 @@ private:
     //Ui::Display *ui;
     void setupBoard(int size);
     void setupPieces();
+    void setupWelcomePage();
+    void setupGamePage();
+    void closingEvent(QCloseEvent *event);
 public slots:
     void setStatusText(const QString& str);
     void setTurnText(const QString& str);
@@ -74,5 +94,6 @@ public slots:
     void logMoves(QString move);
     void colorHelp(QString location);
     void clearPossibleMovesColor(QString locFrom, QString locTo);
+    void runGame();
 };
 #endif // DISPLAY_H

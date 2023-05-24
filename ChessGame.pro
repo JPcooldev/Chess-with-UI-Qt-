@@ -56,4 +56,5 @@ DISTFILES += \
     images/WhiteKnight.png \
     images/WhitePawn.png \
     images/WhiteQueen.png \
-    images/WhiteRook.png
+    images/WhiteRook.png \
+    images/welcomePageImage.png

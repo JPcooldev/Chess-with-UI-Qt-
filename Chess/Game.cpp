@@ -318,20 +318,6 @@ void Game::getInput(QString input)
         QString move1_QString {QString::fromStdString(m_move1)};
         QString move2_QString {QString::fromStdString(m_move2)};
 
-        /*
-        bool eligibleMove = false;
-
-        // check if second click is eligible
-        for (const auto &location : searchPossibleMoves(move1_QString))
-        {
-            if (location == move2_QString)
-            {
-                eligibleMove = true;
-                qDebug() << "Move is marked as eligible";
-            }
-        }
-        */
-
         if (m_chessboard.movePiece(squareFrom, squareTo))
         {
 
@@ -356,6 +342,15 @@ void Game::getInput(QString input)
 
                 QString response {move1_QString + move2_QString};
                 emit sendResponseToDisplay(response);
+
+                if (response ==  "e1c1")
+                    emit sendResponseToDisplay("White queenside castle");
+                else if (response ==  "e1g1")
+                    emit sendResponseToDisplay("White kingside castle");
+                else if (response == "e8c8")
+                    emit sendResponseToDisplay("Black queenside castle");
+                else if (response ==  "e8g8")
+                    emit sendResponseToDisplay("Black kingside castle");
 
                 resetMoves();
             }
@@ -391,7 +386,6 @@ void Game::getInput(QString input)
                     resetMoves();
                     emit signalChangeColorOfSquare(input);
                     getInput(input);
-                    //emit sendResponseToGame(move2_QString);
                     return;
                 }
                 else

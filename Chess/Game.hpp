@@ -32,7 +32,6 @@ public:
     const QVector<QString>& getPossibleMoves() const;
     void clearPossibleMoves();
 private:
-    //std::vector<std::pair<int, int>> help(const std::pair<int, int> &square);
     void castle();
     
     void print();
@@ -41,8 +40,6 @@ private:
     bool isInStalemate(Color color);
     Color whoTurn(int moveCount);
     bool isRightTurn(const std::pair<int, int> &coord, Color turn);
-    
-    //bool isCheckSimulation(std::pair<int, int> &kingLocation, )
     
     std::string whoTurnDisplay(Color color);
     
@@ -77,10 +74,8 @@ public slots:
     void getInput(QString input);
 signals:
     void sendResponseToDisplay(QString response);
-    void sendResponseToGame(QString response);
     void sendLocationOfSquareToClearColor(QString location);
     void sendLocationToGetHelp(QString location);
-    void sendLocationToLogMoves(QString location);
     void signalClearPossibleMovesColor(QString locFrom, QString locTo);
     void signalChangeColorOfSquare(QString squarename);
 };
