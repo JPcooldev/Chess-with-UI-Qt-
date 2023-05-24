@@ -32,6 +32,7 @@ signals:
     void clicked(QString position);
 public slots:
     void clearColor(QString location);
+    void changeColorOfSquare(QString squarename);
 };
 
 #endif // SQUARE_H

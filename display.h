@@ -8,6 +8,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsTextItem>
 #include <QVector>
+#include <QGraphicsProxyWidget>
 
 //QT_BEGIN_NAMESPACE
 //namespace Ui { class Display; }
@@ -30,6 +31,7 @@ class Display : public QMainWindow
     QGraphicsRectItem *turnRect;
     QGraphicsRectItem *rightRect;
     QGraphicsRectItem *movesRect;
+    QGraphicsProxyWidget *proxyRevertMoveButton;
 
     const QString squareNames[64] =
     {
@@ -68,7 +70,7 @@ private:
 public slots:
     void setStatusText(const QString& str);
     void setTurnText(const QString& str);
-    void getResponse(QString response);
+    void getResponseFromGame(QString response);
     void logMoves(QString move);
     void colorHelp(QString location);
     void clearPossibleMovesColor(QString locFrom, QString locTo);

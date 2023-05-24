@@ -389,9 +389,9 @@ std::vector<std::pair<int, int>> Chessboard::getPossibleMoves(const std::pair<in
 {
     std::vector<std::pair<int, int>> locations {};
 
-    for (int row = 0; row < m_board.size(); row++)
+    for (int row = 0; row < int(m_board.size()); row++)
     {
-        for (int square = 0; square < m_board[row].size(); square++)
+        for (int square = 0; square < int(m_board[row].size()); square++)
         {
             std::pair<int, int> location { std::make_pair(row, square) };
             if (isValidMove(squareFrom, location))
@@ -408,9 +408,9 @@ std::vector<std::pair<int,int>> Chessboard::getPiecesLocations(Color color) cons
 {
     std::vector<std::pair<int, int>> locations {};
     
-    for (int row = 0; row < m_board.size(); row++)
+    for (int row = 0; row < int(m_board.size()); row++)
     {
-        for (int square = 0; square < m_board[row].size(); square++)
+        for (int square = 0; square < int(m_board[row].size()); square++)
         {
             std::pair<int, int> location { std::make_pair(row, square) };
             // square is empty, continue search
@@ -428,9 +428,9 @@ std::vector<std::pair<int,int>> Chessboard::getPiecesLocations(Color color) cons
 std::pair<int,int> Chessboard::getKingsLocation(Color color) const
 {
     std::pair<int, int> kingLoc {};
-    for (int row = 0; row < m_board.size(); row++)
+    for (int row = 0; row < int(m_board.size()); row++)
     {
-        for (int square = 0; square < m_board[row].size(); square++)
+        for (int square = 0; square < int(m_board[row].size()); square++)
         {
             std::pair<int, int> location { std::make_pair(row, square) };
             // square is empty, continue search
@@ -447,6 +447,9 @@ std::pair<int,int> Chessboard::getKingsLocation(Color color) const
 // checks if move from to to is valid
 bool Chessboard::isValidMove(const std::pair<int, int> &from, const std::pair<int, int> &to) const
 {
+    if (from == to)
+        return false;
+
     if (m_board[from.first][from.second]->isValidMove(*this, from, to))
         return true;
     else
