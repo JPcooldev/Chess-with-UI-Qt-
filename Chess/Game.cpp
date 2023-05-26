@@ -106,18 +106,6 @@ void Game::run()
     }
 }
 
-
-/*
-std::vector<std::pair<int, int>> Game::help(const std::pair<int, int> &square)
-{
-    return chessboard.showPossibleMoves(square);
-}
- */
-
-void Game::castle() {
-    ;
-}
-
 // determones if player get himself into check by his move
 bool Game::isInCheck(Color defendingColor) const
 {

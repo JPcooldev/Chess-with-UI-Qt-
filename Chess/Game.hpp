@@ -32,8 +32,6 @@ public:
     const QVector<QString>& getPossibleMoves() const;
     void clearPossibleMoves();
 private:
-    void castle();
-    
     void print();
     bool isInCheck(Color color) const;
     bool isInCheckMate(Color color);

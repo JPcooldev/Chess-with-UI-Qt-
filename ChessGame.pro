@@ -36,8 +36,7 @@ HEADERS += \
     display.h \
     square.h
 
-FORMS += \
-    display.ui
+FORMS +=
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -58,3 +57,6 @@ DISTFILES += \
     images/WhiteQueen.png \
     images/WhiteRook.png \
     images/welcomePageImage.png
+
+RESOURCES += \
+    resources.qrc

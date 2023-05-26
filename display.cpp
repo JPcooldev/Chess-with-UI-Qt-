@@ -98,7 +98,7 @@ void Display::setupWelcomePage()
     startButton->setStyleSheet("background-color: gray;");
 
     welcomeImage = new QLabel();
-    QPixmap image("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/welcomePageImage.png");
+    QPixmap image(":/welcomePageImage");
     welcomeImage->setPixmap(image);
     welcomeImage->setScaledContents(true);
 
@@ -285,42 +285,42 @@ void Display::setupBoard(int size)
 void Display::setupPieces()
 {
     // black
-    squaresBoard[0]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/BlackRook.png");
-    squaresBoard[1]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/BlackKnight.png");
-    squaresBoard[2]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/BlackBishop.png");
-    squaresBoard[3]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/BlackQueen.png");
-    squaresBoard[4]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/BlackKing.png");
-    squaresBoard[5]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/BlackBishop.png");
-    squaresBoard[6]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/BlackKnight.png");
-    squaresBoard[7]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/BlackRook.png");
+    squaresBoard[0]->setImage(":/BlackRook");
+    squaresBoard[1]->setImage(":/BlackKnight");
+    squaresBoard[2]->setImage(":/BlackBishop");
+    squaresBoard[3]->setImage(":/BlackQueen");
+    squaresBoard[4]->setImage(":/BlackKing");
+    squaresBoard[5]->setImage(":/BlackBishop");
+    squaresBoard[6]->setImage(":/BlackKnight");
+    squaresBoard[7]->setImage(":/BlackRook");
 
-    squaresBoard[8]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/BlackPawn.png");
-    squaresBoard[9]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/BlackPawn.png");
-    squaresBoard[10]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/BlackPawn.png");
-    squaresBoard[11]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/BlackPawn.png");
-    squaresBoard[12]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/BlackPawn.png");
-    squaresBoard[13]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/BlackPawn.png");
-    squaresBoard[14]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/BlackPawn.png");
-    squaresBoard[15]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/BlackPawn.png");
+    squaresBoard[8]->setImage(":/BlackPawn");
+    squaresBoard[9]->setImage(":/BlackPawn");
+    squaresBoard[10]->setImage(":/BlackPawn");
+    squaresBoard[11]->setImage(":/BlackPawn");
+    squaresBoard[12]->setImage(":/BlackPawn");
+    squaresBoard[13]->setImage(":/BlackPawn");
+    squaresBoard[14]->setImage(":/BlackPawn");
+    squaresBoard[15]->setImage(":/BlackPawn");
 
     // white
-    squaresBoard[48]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/WhitePawn.png");
-    squaresBoard[49]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/WhitePawn.png");
-    squaresBoard[50]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/WhitePawn.png");
-    squaresBoard[51]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/WhitePawn.png");
-    squaresBoard[52]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/WhitePawn.png");
-    squaresBoard[53]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/WhitePawn.png");
-    squaresBoard[54]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/WhitePawn.png");
-    squaresBoard[55]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/WhitePawn.png");
+    squaresBoard[48]->setImage(":/WhitePawn");
+    squaresBoard[49]->setImage(":/WhitePawn");
+    squaresBoard[50]->setImage(":/WhitePawn");
+    squaresBoard[51]->setImage(":/WhitePawn");
+    squaresBoard[52]->setImage(":/WhitePawn");
+    squaresBoard[53]->setImage(":/WhitePawn");
+    squaresBoard[54]->setImage(":/WhitePawn");
+    squaresBoard[55]->setImage(":/WhitePawn");
 
-    squaresBoard[56]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/WhiteRook.png");
-    squaresBoard[57]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/WhiteKnight.png");
-    squaresBoard[58]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/WhiteBishop.png");
-    squaresBoard[59]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/WhiteQueen.png");
-    squaresBoard[60]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/WhiteKing.png");
-    squaresBoard[61]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/WhiteBishop.png");
-    squaresBoard[62]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/WhiteKnight.png");
-    squaresBoard[63]->setImage("/Users/jp/Desktop/dev/qt/projects/ChessGame/images/WhiteRook.png");
+    squaresBoard[56]->setImage(":/WhiteRook");
+    squaresBoard[57]->setImage(":/WhiteKnight");
+    squaresBoard[58]->setImage(":/WhiteBishop");
+    squaresBoard[59]->setImage(":/WhiteQueen");
+    squaresBoard[60]->setImage(":/WhiteKing");
+    squaresBoard[61]->setImage(":/WhiteBishop");
+    squaresBoard[62]->setImage(":/WhiteKnight");
+    squaresBoard[63]->setImage(":/WhiteRook");
 }
 
 void Display::setStatusText(const QString& str)
