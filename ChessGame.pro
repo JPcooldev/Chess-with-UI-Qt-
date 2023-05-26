@@ -57,3 +57,6 @@ DISTFILES += \
     images/WhiteQueen.png \
     images/WhiteRook.png \
     images/welcomePageImage.png
+
+RESOURCES += \
+    resources.qrc
